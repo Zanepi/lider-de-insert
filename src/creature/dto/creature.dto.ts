@@ -3,7 +3,7 @@ type PictureDefinition =
         pictureURL: string
     };
 
-export class Creature {
+export class CreatureDTO {
     name: string;
 
     pictures: PictureDefinition[];

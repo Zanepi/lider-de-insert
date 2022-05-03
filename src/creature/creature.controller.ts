@@ -1,5 +1,5 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
-import { Creature } from './creature.dto';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { CreatureDTO } from './dto/creature.dto';
 import { CreatureService } from './creature.service';
 
 
@@ -8,7 +8,7 @@ export class CreatureController {
     constructor(private creatureServices: CreatureService){}
 
     @Get('all')
-    findAll(): Creature[] {
+    findAll(): CreatureDTO[] {
         return this.creatureServices.findAll();
     }
 
@@ -18,8 +18,8 @@ export class CreatureController {
     }
 
     @Post()
-    create(): string {
-        return 'Ingresa una nueva criatura a la lista';
+    async create(@Body() newCreatureDTO: CreatureDTO): Promise<CreatureDTO> {
+        return this.creatureServices.create(newCreatureDTO);
     }
 
 }
