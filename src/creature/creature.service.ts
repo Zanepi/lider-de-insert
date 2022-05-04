@@ -17,44 +17,39 @@ export class CreatureService {
 
     async findAll(): Promise<CreatureDTO[]>{        
         let curatedCreaturesList : CreatureDTO[] = [];
-        const creaturesList = await this.creatureModel.find({})
+        await this.creatureModel.find({})
         .exec()
         .then(creatures =>{
             curatedCreaturesList = creatures.map(function(c){
-                return this.fromModelToDTO(c);
+                return fromModelToDTO(c);
             })
         })
-        return Promise.all(curatedCreaturesList);
+        return curatedCreaturesList;
     }
 
     async findByCreatureId(creatureId: Number): Promise<CreatureDTO>{
         let creatureDTO : CreatureDTO = null;        
-
-        const creature = await this.creatureModel.findOne({creatureId})
+        await this.creatureModel.findOne({creatureId})
         .exec()
-        .then(creature => creatureDTO = this.fromModelToDTO(creature)); 
+        .then(creature => creatureDTO = fromModelToDTO(creature)); 
         return creatureDTO;
     }
 
     async toggleCreatureAvailability(creatureId: Number): Promise<CreatureDTO>{
-        let creatureDTO : CreatureDTO = null;
-
         const creature = await this.creatureModel.findOne({creatureId});
         creature.active = !creature.active;
         await creature.save();
-        creatureDTO = this.fromModelToDTO(creature);
-        return creatureDTO;
-
-    }
-
-    fromModelToDTO(c : Creature): CreatureDTO{
-        let creatureDTO: CreatureDTO = {
-            name : c.name,
-            description : c.description,
-            pictures: c.pictures,
-            active: c.active
-        }
-        return creatureDTO;
-    }
+        return fromModelToDTO(creature);  
+    }    
 
 }
+function fromModelToDTO(c: Creature ): CreatureDTO {
+    let creatureDTO: CreatureDTO = {
+        name : c.name,
+        description : c.description,
+        pictures: c.pictures,
+        active: c.active
+    }
+    return creatureDTO;
+}
+
