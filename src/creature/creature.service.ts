@@ -3,17 +3,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreatureDTO } from './dto/creature.dto';
 import {Creature,CreatureDocument} from './creature.schema';
+import { doc } from 'prettier';
 
 @Injectable()
 export class CreatureService {
 
-    constructor(@InjectModel(Creature.name) private creatureModel : Model<CreatureDocument>){}
-
-    private readonly creatures : CreatureDTO[] = [
-        {name: "Alien",pictures: [{pictureDescription: "foto1", pictureURL: "heet"}], description: "heehee"},
-        {name: "Kong",pictures: [{pictureDescription: "foto2", pictureURL: "he2et"}], description: "heehee2"},
-        {name: "Gojira",pictures: [{pictureDescription: "foto3", pictureURL: "hee3t"}], description: "heehee3"},
-    ]
+    constructor(@InjectModel(Creature.name) private creatureModel : Model<CreatureDocument>){}    
 
     async create(newCreature: CreatureDTO): Promise<Creature>{
         const createdCreature = new this.creatureModel(newCreature);
@@ -25,13 +20,41 @@ export class CreatureService {
         const creaturesList = await this.creatureModel.find({})
         .exec()
         .then(creatures =>{
-            creatures.forEach(c => curatedCreaturesList.push({
-                name : c.name,
-                pictures: c.pictures,
-                description: c.description
-            }));
+            curatedCreaturesList = creatures.map(function(c){
+                return this.fromModelToDTO(c);
+            })
         })
         return Promise.all(curatedCreaturesList);
+    }
+
+    async findByCreatureId(creatureId: Number): Promise<CreatureDTO>{
+        let creatureDTO : CreatureDTO = null;        
+
+        const creature = await this.creatureModel.findOne({creatureId})
+        .exec()
+        .then(creature => creatureDTO = this.fromModelToDTO(creature)); 
+        return creatureDTO;
+    }
+
+    async toggleCreatureAvailability(creatureId: Number): Promise<CreatureDTO>{
+        let creatureDTO : CreatureDTO = null;
+
+        const creature = await this.creatureModel.findOne({creatureId});
+        creature.active = !creature.active;
+        await creature.save();
+        creatureDTO = this.fromModelToDTO(creature);
+        return creatureDTO;
+
+    }
+
+    fromModelToDTO(c : Creature): CreatureDTO{
+        let creatureDTO: CreatureDTO = {
+            name : c.name,
+            description : c.description,
+            pictures: c.pictures,
+            active: c.active
+        }
+        return creatureDTO;
     }
 
 }

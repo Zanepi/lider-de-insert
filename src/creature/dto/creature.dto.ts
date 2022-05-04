@@ -10,4 +10,6 @@ export class CreatureDTO {
 
     description: string; 
 
+    active: boolean;
+
 }

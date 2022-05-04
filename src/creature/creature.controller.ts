@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { CreatureDTO } from './dto/creature.dto';
 import { CreatureService } from './creature.service';
 
@@ -12,13 +12,18 @@ export class CreatureController {
     }
 
     @Get(':id')
-    findOne(@Param() params): string{
-        return `Obtiene la criatura indicada por el campo id, en este caso, #${params.id}`;
+    findOne(@Param() params): Promise<CreatureDTO>{
+        return this.creatureServices.findByCreatureId(params.id);
     }
 
     @Post('create')
     async create(@Body() newCreatureDTO: CreatureDTO): Promise<CreatureDTO> {
         return this.creatureServices.create(newCreatureDTO);
+    }
+
+    @Patch('toggle/:id')
+    async toggleCreatureAvailability(@Param() params): Promise<CreatureDTO>{
+        return this.creatureServices.toggleCreatureAvailability(params.id);
     }
 
 }
