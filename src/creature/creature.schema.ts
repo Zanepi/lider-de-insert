@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document} from 'mongoose';
+import { Document } from 'mongoose';
 
 export type CreatureDocument =  Creature & Document;
 
@@ -8,8 +8,10 @@ type PictureDefinition =
         pictureURL: string
     };
 
-@Schema()
+@Schema({timestamps : true})
 export class Creature {
+    
+
     @Prop()
     name: string;
 
@@ -17,8 +19,10 @@ export class Creature {
     pictures: PictureDefinition[];
 
     @Prop()
-    description: string;    
+    description: string;
 
+    @Prop({default: true})
+    active : boolean;
 
 }
 

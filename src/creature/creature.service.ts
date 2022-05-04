@@ -20,9 +20,18 @@ export class CreatureService {
         return createdCreature.save();
     }
 
-    findAll(): CreatureDTO[]{
-        // TODO: Crear conexion con mongo para buscar Creatures en la BD
-        return this.creatures;
+    async findAll(): Promise<CreatureDTO[]>{        
+        let curatedCreaturesList : CreatureDTO[] = [];
+        const creaturesList = await this.creatureModel.find({})
+        .exec()
+        .then(creatures =>{
+            creatures.forEach(c => curatedCreaturesList.push({
+                name : c.name,
+                pictures: c.pictures,
+                description: c.description
+            }));
+        })
+        return Promise.all(curatedCreaturesList);
     }
 
 }
